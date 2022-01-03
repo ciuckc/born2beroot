@@ -1,0 +1,14 @@
+#!/bin/bash
+wall -n $'\t#Arhitecture: ' $(uname -a) \
+$'\n\t#CPU physical: ' $(getconf _NPROCESSORS_ONLN) \
+$'\n\t#vCPU: ' $(getconf _NPROCESSORS_ONLN) \
+$'\n\t#Memory usage: ' $(free -m | sed -n '1!p' | grep "Mem" | awk '{printf "%s/%sMB (%.4s%%)",$3,$2,($3/$2)*100}') \
+$'\n\t#Disk usage: ' $(df -m | grep "/dev/mapper/" | awk '{disk_used+=$3; total_disk+=$2;} END{printf "%s/%.4sGB (%.4s%%)", disk_used, total_disk/1000, (disk_used/total_disk)*100}') \
+$'\n\t#CPU usage: ' $(top -n 1 -b | grep "%Cpu(s)" | awk '{printf "%s%%", $2}') \
+$'\n\t#Last boot: ' $(who -b  | awk '{print $3, $4}') \
+$'\n\t#LVM use: ' $(lsblk | grep "lvm" | awk '{if($1){print "yes"}else{print "no"}exit;}') \
+$'\n\t#TCP connections: ' $(ss -s | grep "estab" | awk '{print ($4 + 0), ESTABLISHED}') \
+$'\n\t#User logs: ' $(who | wc -l) \
+$'\n\t#Network IP: ' $(hostname -I) $(ip link show | grep "ether" | awk '{printf "(%s)",$2}') \
+$'\n\t#Sudo logs: ' $(cat /var/log/sudo/sudo.log | grep -v ": root :" | grep "TTY" | wc -l)
+
